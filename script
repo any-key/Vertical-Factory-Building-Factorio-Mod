@@ -1,0 +1,91 @@
+stackFrame = game.player.gui.screen.add
+{
+   type = "frame",
+   name = "the_frame",
+   direction = "vertical"
+}
+local titlebar = stackFrame.add{type = "flow"}
+titlebar.drag_target = stackFrame titlebar.add
+{
+   type = "label",
+   style = "frame_title",
+   caption = "Building",
+   ignored_by_interaction = true,
+}
+local filler = titlebar.add
+{
+   type = "empty-widget",
+   style = "draggable_space",
+   ignored_by_interaction = true,
+}
+filler.style.height = 24
+filler.style.horizontally_stretchable = true
+titlebar.add
+{
+   type = "sprite-button",
+   name = "the-x-button",
+   style = "frame_action_button",
+   sprite = "utility/close",
+   hovered_sprite = "utility/close_black",
+   clicked_sprite = "utility/close_black",
+   tooltip = "gui.close-instruction"
+}
+
+
+game.player.opened = stackFrame script.on_event
+(
+   defines.events.on_gui_click,
+   function(event)
+       if event.element.name == "the-x-button"
+       then event.element.parent.parent.destroy()
+       end
+   end
+)
+script.on_event
+(
+   defines.events.on_gui_closed,
+   function(event)
+       if event.element and event.element.valid and event.element.name == "the_frame"
+       then event.element.destroy()
+       end
+   end
+)
+
+local total_num_cams = 3
+local building_index_ = game.surfaces["fulgora-factory-floor"].index
+function make_cam(index, name)
+ local x = index * 512
+ local name = stackFrame.add
+ {
+   type="camera",
+   name=name,
+   position={x,0},
+   surface_index=building_index,
+   zoom=1
+ };
+ name.style.minimal_width = game.player.display_resolution.width - 15;
+ name.style.minimal_height = (game.player.display_resolution.height / total_num_cams) - 37;
+end
+
+
+function newbreak(index, name)
+ local name = stackFrame.add
+ {
+   type="line", 
+   name=name
+ }
+end
+
+make_cam(3, "top_cam")
+
+newbreak(1)
+newbreak(2)
+newbreak(3)
+
+make_cam(2, "mid_cam")
+
+newbreak(4)
+newbreak(5)
+newbreak(6)
+
+make_cam(1, "bottom_cam")
