@@ -1,30 +1,30 @@
-stackFrame = game.player.gui.screen.add
-(
+buildingViewFrame = game.player.gui.screen.add
+{
    type = "frame",
-   name = "the_frame",
+   name = "building_view_frame",
    direction = "vertical"
-)
-local titlebar = stackFrame.add
-(
+}
+local titlebar = buildingViewFrame.add
+{
    type = "flow"
-)
-titlebar.drag_target = stackFrame titlebar.add
-(
+}
+titlebar.drag_target = buildingViewFrame titlebar.add
+{
    type = "label",
    style = "frame_title",
-   caption = "Building",
+   caption = "Building View",
    ignored_by_interaction = true,
-)
+}
 local filler = titlebar.add
-(
+{
    type = "empty-widget",
    style = "draggable_space",
    ignored_by_interaction = true,
-)
+}
 filler.style.height = 24
 filler.style.horizontally_stretchable = true
 titlebar.add
-(
+{
    type = "sprite-button",
    name = "the-x-button",
    style = "frame_action_button",
@@ -32,55 +32,57 @@ titlebar.add
    hovered_sprite = "utility/close_black",
    clicked_sprite = "utility/close_black",
    tooltip = "gui.close-instruction"
-)
+}
 
 
-game.player.opened = stackFrame script.on_event
-(
+game.player.opened = buildingViewFrame script.on_event
+{
    defines.events.on_gui_click,
    function(event)
        if event.element.name == "the-x-button"
        then event.element.parent.parent.destroy()
        end
    end
-)
+}
 script.on_event
-(
+{
    defines.events.on_gui_closed,
    function(event)
-       if event.element and event.element.valid and event.element.name == "the_frame"
+       if event.element and event.element.valid and event.element.name == "building_view_frame"
        then event.element.destroy()
        end
    end
-)
+}
 
-local camera_width = game.player.display_resolution.width - 15
-local total_num_cams = 3
+local camera_width_thin = 500
+local camera_width_fs = game.player.display_resolution.width - 15
 local building_index_ = game.surfaces["fulgora-factory-floor"].index
-local line_index = 1
-function make_building_view(top_floor, bottom_floor)
+function make_building_view(top_floor, bottom_floor, camera_width)
+  local line_index = 1
   local total_num_cams = top_floor - (bottom_floor - 1)
-  for i = top_floor, i >= bottom_floor, i-- do
-   local x = i * 51
-   local floor_..i.._cam = stackFrame.add
-   (
+  for i = top_floor, bottom_floor, -1 do
+   local x = i * 512
+   local cam_name = "floor_"..i.."_cam"
+   local cam_name = buildingViewFrame.add
+   {
      type = "camera",
-     name = "floor_"..i.."_cam_a",
-     position = (x,0),
+     name = cam_name.."_element",
+     position = {x,0},
      surface_index = building_index,
      zoom = 1
-   )
+   }
    name.style.minimal_width = camera_width
    name.style.minimal_height = (game.player.display_resolution.height / total_num_cams) - 37
-   for i = line_index, i <= 3, i++ do
-     local line_..i = stackFrame.add
-     (
+   for j = line_index, 3 do
+     local line_name = "line_"..j
+     local line_name = buildingViewFrame.add
+     {
        type = "line", 
-       name = "line_"..i.."_a"
-     )
-     line_index += i
+       name = line_name.."_element"
+     }
+     line_index = line_index + 1
    end
   end
 end
 
-make_building_view(5, 1)
+make_building_view(5, 1, camera_width_fs)
